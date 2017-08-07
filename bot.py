@@ -7,8 +7,8 @@ from random import randint
 
 # Logging config
 logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler(filename='log/discord.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
@@ -17,7 +17,7 @@ Nestor = commands.Bot(command_prefix='.', description="Nestor, at your service."
 
 @Nestor.event
 async def on_ready():
-    print('Logged in as')
+    print('Logged in as :')
     print(Nestor.user.name)
     print(Nestor.user.id)
 
@@ -38,12 +38,13 @@ async def tg(ctx, name = "Johnnyeco", count = 1):
                 if counter <= count:
                     await Nestor.delete_message(message)
         
-        await Nestor.send_message(channel,'Be a nice doggo !')
+                    await Nestor.send_message(channel,'Be a nice doggo !')
 
     else:
         await Nestor.send_message(channel, "Sorry, I don't take orders from you ...")
 
 
+"""
 @Nestor.event
 async def on_message(message):
 
@@ -60,7 +61,8 @@ async def on_message(message):
         return
     else:
         await Nestor.process_commands(message)
-
+        
+"""
 
 
 if __name__=="__main__":
@@ -70,11 +72,12 @@ if __name__=="__main__":
         TOKEN = file.read()
 
     # This specifies what extensions to load when the bot starts up
-    startup_extensions = ["music", "other", "game", "fun", "chat"]
+    startup_extensions = ["other", "game", "fun", "image", "music", "trivia"]
 
     # Load startup extensions
     for extension in startup_extensions:
         try:
+            extension = "moduls."+ extension
             Nestor.load_extension(extension)
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)

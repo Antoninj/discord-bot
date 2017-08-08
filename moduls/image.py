@@ -25,7 +25,7 @@ class Image:
     async def _imgur(self, ctx):
         """Retrieves pictures from imgur"""
         if ctx.invoked_subcommand is None:
-            await self.bot.send_cmd_help(ctx)
+            await self.bot.say("Type **.help imgur** for subcommands information.")
 
     @_imgur.command(pass_context=True, name="random")
     async def imgur_random(self, ctx, *, term: str=None):

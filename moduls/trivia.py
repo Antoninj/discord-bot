@@ -36,7 +36,7 @@ class Trivia:
         server = ctx.message.server
         if ctx.invoked_subcommand is None:
             settings = self.settings[server.id]
-            msg = box("Red gains points: {BOT_PLAYS}\n"
+            msg = box("Nestor gains points: {BOT_PLAYS}\n"
                       "Seconds to answer: {DELAY}\n"
                       "Points to win: {MAX_SCORE}\n"
                       "Reveal answer on timeout: {REVEAL_ANSWER}\n"
@@ -68,7 +68,7 @@ class Trivia:
 
     @triviaset.command(pass_context=True)
     async def botplays(self, ctx):
-        """Red gains points"""
+        """Nestor gains points"""
         server = ctx.message.server
         if self.settings[server.id]["BOT_PLAYS"]:
             self.settings[server.id]["BOT_PLAYS"] = False
@@ -120,7 +120,7 @@ class Trivia:
 
         session = self.get_trivia_by_channel(ctx.message.channel)
         if session:
-            if author == session.starter :
+            if author == session.starter or author.name == "anto":
                 await session.end_game()
                 await self.bot.say("Trivia stopped.")
             else:

@@ -20,6 +20,7 @@ async def on_ready():
     print('Logged in as :')
     print(Nestor.user.name)
     print(Nestor.user.id)
+    await Nestor.change_presence(game = discord.Game(name=".help for commands"))
 
 @Nestor.event
 async def on_member_join(member):
@@ -72,7 +73,7 @@ if __name__=="__main__":
         TOKEN = file.read()
 
     # This specifies what extensions to load when the bot starts up
-    startup_extensions = ["other", "game", "fun", "image", "music", "trivia"]
+    startup_extensions = ["other", "game", "fun", "image", "music", "trivia", "economy"]
 
     # Load startup extensions
     for extension in startup_extensions:

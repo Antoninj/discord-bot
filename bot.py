@@ -54,9 +54,13 @@ async def fml_background_task():
     channels = Nestor.get_all_channels()
     channels_ids = [channel.id for channel in channels if channel.name == "general" and channel.type is discord.ChannelType.text]
 
+    count = 0
     while not Nestor.is_closed:
-        
-        url = 'https://www.fmylife.com/random'
+        if count % 2 == 0:
+            url = 'https://www.fmylife.com/random'
+        else:
+            url = "http://www.viedemerde.fr/aleatoire"
+
         async with aiohttp.request('GET',url) as fml_website:
             data  = await fml_website.text()
             tree = html.fromstring(data)
@@ -67,6 +71,8 @@ async def fml_background_task():
             channel = Nestor.get_channel(id)
             await Nestor.send_message(channel, fml)
         await asyncio.sleep(3600) # task runs every hour
+
+        count+=1
 
 """
 @Nestor.event

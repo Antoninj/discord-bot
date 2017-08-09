@@ -5,9 +5,10 @@ import chatterbot
 
 from PIL import Image
 from io import BytesIO
+from lxml import html
 
 import random
-from random import randint
+from random import randint,choice
 
 import aiohttp
 
@@ -140,6 +141,22 @@ class Fun:
 
         coinflip = ['Heads!', 'Tails!']
         await self.bot.say(random.choice(coinflip))
+
+
+    @commands.command()
+    async def fml(self):
+        """ Fuck my life
+        Nestor will tell you a random fuck my life sentence.
+        eg. *fml"""
+
+        url = 'https://www.fmylife.com/random'
+
+        async with aiohttp.request('GET',url) as fml_website:
+            data  = await fml_website.text()
+            tree = html.fromstring(data)
+            fml_text= tree.xpath('//p[@class="block hidden-xs"]/a/text()')
+            fml = choice(fml_text)
+            await self.bot.say(fml)
 
 
 def setup(bot):

@@ -3,7 +3,12 @@ import asyncio
 from discord.ext import commands
 import logging
 import random
-from random import randint
+from lxml import html
+
+import random
+from random import randint,choice
+
+import aiohttp
 
 # Logging config
 logger = logging.getLogger('discord')
@@ -12,7 +17,7 @@ handler = logging.FileHandler(filename='log/discord.log', encoding='utf-8', mode
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-Nestor = commands.Bot(command_prefix='.', description="Nestor, at your service.")
+Nestor = commands.Bot(command_prefix=commands.when_mentioned_or('.'), description="Nestor, at your service.")
 
 
 @Nestor.event
@@ -39,11 +44,28 @@ async def tg(ctx, name = "Johnnyeco", count = 1):
                 if counter <= count:
                     await Nestor.delete_message(message)
         
-                    await Nestor.send_message(channel,'Be a nice doggo !')
+        await Nestor.send_message(channel,'Be a nice doggo !')
 
     else:
         await Nestor.send_message(channel, "Sorry, I don't take orders from you ...")
 
+async def fml_background_task():
+    await Nestor.wait_until_ready()
+    channels = Nestor.get_all_channels()
+    channels_ids = [channel.id for channel in channels if channel.name == "general" and channel.type is discord.ChannelType.text]
+
+    url = 'https://www.fmylife.com/random'
+    async with aiohttp.request('GET',url) as fml_website:
+        data  = await fml_website.text()
+        tree = html.fromstring(data)
+        fml_text= tree.xpath('//p[@class="block hidden-xs"]/a/text()')
+        fml = choice(fml_text)
+
+    while not Nestor.is_closed:
+        for id in channels_ids[:2]:
+            channel = Nestor.get_channel(id)
+            await Nestor.send_message(channel, fml)
+        await asyncio.sleep(3600) # task runs every hour
 
 """
 @Nestor.event
@@ -83,6 +105,9 @@ if __name__=="__main__":
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
+
+    # Set up background tasks
+    Nestor.loop.create_task(fml_background_task())
 
     # Run the bot
     Nestor.run(TOKEN)

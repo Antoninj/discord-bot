@@ -54,14 +54,15 @@ async def fml_background_task():
     channels = Nestor.get_all_channels()
     channels_ids = [channel.id for channel in channels if channel.name == "general" and channel.type is discord.ChannelType.text]
 
-    url = 'https://www.fmylife.com/random'
-    async with aiohttp.request('GET',url) as fml_website:
-        data  = await fml_website.text()
-        tree = html.fromstring(data)
-        fml_text= tree.xpath('//p[@class="block hidden-xs"]/a/text()')
-        fml = choice(fml_text)
-
     while not Nestor.is_closed:
+        
+        url = 'https://www.fmylife.com/random'
+        async with aiohttp.request('GET',url) as fml_website:
+            data  = await fml_website.text()
+            tree = html.fromstring(data)
+            fml_text= tree.xpath('//p[@class="block hidden-xs"]/a/text()')
+            fml = choice(fml_text)
+
         for id in channels_ids[:2]:
             channel = Nestor.get_channel(id)
             await Nestor.send_message(channel, fml)

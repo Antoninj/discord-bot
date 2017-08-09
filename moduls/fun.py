@@ -43,7 +43,7 @@ class Fun:
     async def love(self, ctx , name1: str, name2 : str):
         """Show % of affinity between 2 persons
         Nestor will tell you if you are compatible with someone else.
-        eg. *love lise"""
+        eg. *love john lise"""
 
         api_key = "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot"
         payload = {"fname": name1, "sname" : name2}

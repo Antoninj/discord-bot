@@ -70,7 +70,7 @@ async def fml_background_task():
         for id in channels_ids[:2]:
             channel = Nestor.get_channel(id)
             await Nestor.send_message(channel, fml)
-        await asyncio.sleep(3600) # task runs every hour
+        await asyncio.sleep(7200) # task runs every 2 hours
 
         count+=1
 
@@ -114,7 +114,7 @@ if __name__=="__main__":
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
     # Set up background tasks
-    Nestor.loop.create_task(fml_background_task())
+    #Nestor.loop.create_task(fml_background_task())
 
     # Run the bot
     Nestor.run(TOKEN)

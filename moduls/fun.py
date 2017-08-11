@@ -220,6 +220,8 @@ class Fun:
                 channel = self.bot.get_channel(id)
                 await self.bot.send_message(channel, sentence)
 
+            await asyncio.sleep(time) 
+
 def setup(bot):
      # Set up background tasks
     bot.add_cog(Fun(bot))

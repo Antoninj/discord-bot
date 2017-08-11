@@ -38,6 +38,29 @@ class Other:
         args = ' '.join(args)
         await self.bot.change_presence(game = discord.Game(name='%s' % args))
 
+    
+    #@self.bot.event
+    async def on_member_join(self, member):
+        server = member.server
+        fmt = 'Welcome {0.mention} to {1.name}!'
+        await self.bot.send_message(server, fmt.format(member, server))
+    
+    def check_if_it_is_me(ctx):
+        return ctx.message.author.name == "anto"
+
+    @commands.command(pass_context=True, hidden = True)
+    @commands.check(check_if_it_is_me)
+    async def tg(self, ctx, name = "Johnnyeco", count = 1):
+        channel = ctx.message.channel
+        counter = 0
+        async for message in self.bot.logs_from(channel, limit=100):
+            if message.author.name == name:
+                counter+=1
+                if counter <= count:
+                    await self.bot.delete_message(message)
+            
+        await self.bot.send_message(channel,'Be a nice doggo!')
+
 
 def setup(bot):
     bot.add_cog(Other(bot))

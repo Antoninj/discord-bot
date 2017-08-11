@@ -1,7 +1,6 @@
 import discord
 import asyncio
 from discord.ext import commands
-import chatterbot
 
 from PIL import Image
 from io import BytesIO
@@ -9,7 +8,6 @@ from lxml import html
 
 import random
 from random import randint,choice
-
 import aiohttp
 
 class Fun:
@@ -17,6 +15,8 @@ class Fun:
     """
     def __init__(self, bot):
         self.bot = bot
+        self.bot.loop.create_task(self.fml_background_task(7200)) # task runs every 2 hours
+        self.bot.loop.create_task(self.quotes_background_task(3600)) # task runs every hour
 
     @commands.command()
     async def horoscope(self, sign : str):
@@ -99,16 +99,13 @@ class Fun:
 
 
     @commands.command()
-    async def quotes(self, count : int = None):
+    async def quotes(self, count : int = 1):
         """Random quotes
         Nestor will provide you with a random quotation.
         eg. *quotes"""
 
         api_key = "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot"
         categories = ["movies","famous"]
-
-        if count is None: 
-            count = 1
 
         payload = {"cat":random.choice(categories),'count' : count}
         headers={ "X-Mashape-Key": "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot", 
@@ -158,6 +155,71 @@ class Fun:
             fml = choice(fml_text)
             await self.bot.say(fml)
 
+    async def fml_background_task(self, time : int):
+        await self.bot.wait_until_ready()
+        channels = self.bot.get_all_channels()
+        channels_ids = [channel.id for channel in channels if channel.name == "bot-spam" and channel.type is discord.ChannelType.text]
+
+        count = 0
+        while not self.bot.is_closed:
+            if count % 2 == 0:
+                url = 'https://www.fmylife.com/random'
+            else:
+                url = "http://www.viedemerde.fr/aleatoire"
+
+            async with aiohttp.request('GET',url) as fml_website:
+                data  = await fml_website.text()
+                tree = html.fromstring(data)
+                fml_text= tree.xpath('//p[@class="block hidden-xs"]/a/text()')
+                fml = choice(fml_text)
+
+            for id in channels_ids[:2]:
+                channel = self.bot.get_channel(id)
+                await self.bot.send_message(channel, fml)
+            await asyncio.sleep(time) 
+
+            count+=1
+
+    async def quotes_background_task(self, time : int, count : int = 1):
+        """Random quotes
+        Nestor will provide you with a random quotation.
+        eg. *quotes"""
+
+        api_key = "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot"
+        categories = ["movies","famous"]
+
+        payload = {"cat":random.choice(categories),'count' : count}
+        headers={ "X-Mashape-Key": "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot", 
+        "Accept": "text/plain"}
+
+        url = 'https://andruxnet-random-famous-quotes.p.mashape.com/'
+
+        await self.bot.wait_until_ready()
+        channels = self.bot.get_all_channels()
+        channels_ids = [channel.id for channel in channels if channel.name == "bot-spam" and channel.type is discord.ChannelType.text]
+
+        while not self.bot.is_closed:
+            await asyncio.sleep(time) 
+
+            async with aiohttp.request('GET',url, params = payload , headers = headers) as resp:
+
+                data  = await resp.json()
+                if count >1:
+                    quotes = [quote["quote"] for quote in data]
+                    authors = [quote["author"] for quote in data]
+                    
+                else:
+                    quotes = [data["quote"]]
+                    authors = [data["author"]]
+
+                zipped = list(zip(quotes,authors))
+                curated  = [" ".join(item) for item in zipped]
+                sentence = '\n'.join(curated)
+
+            for id in channels_ids[:2]:
+                channel = self.bot.get_channel(id)
+                await self.bot.send_message(channel, sentence)
 
 def setup(bot):
+     # Set up background tasks
     bot.add_cog(Fun(bot))

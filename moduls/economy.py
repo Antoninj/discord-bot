@@ -17,6 +17,8 @@ default_settings = {"PAYDAY_TIME": 300, "PAYDAY_CREDITS": 120,
                     "SLOT_MIN": 5, "SLOT_MAX": 100, "SLOT_TIME": 0,
                     "REGISTER_CREDITS": 0}
 
+def check_if_it_is_me(ctx):
+    return ctx.message.author.name == "anto"
 
 class EconomyError(Exception):
     pass
@@ -360,6 +362,7 @@ class Economy:
             await self.bot.say("That user has no bank account.")
 
     @_bank.command(name="set", pass_context=True)
+    @commands.check(check_if_it_is_me)
     #@checks.admin_or_permissions(manage_server=True)
     async def _set(self, ctx, user: discord.Member, credits: SetParser):
         """Sets credits of user's bank account. See help for more operations
@@ -370,53 +373,45 @@ class Economy:
             bank set @Twentysix -6 - Removes 6 credits"""
         author = ctx.message.author
 
-        if author.name == "anto":
-
-            try:
-                if credits.operation == "deposit":
-                    self.bank.deposit_credits(user, credits.sum)
-                    logger.info("{}({}) added {} credits to {} ({})".format(
-                        author.name, author.id, credits.sum, user.name, user.id))
-                    await self.bot.say("{} credits have been added to {}"
+        try:
+            if credits.operation == "deposit":
+                self.bank.deposit_credits(user, credits.sum)
+                logger.info("{}({}) added {} credits to {} ({})".format(
+                    author.name, author.id, credits.sum, user.name, user.id))
+                await self.bot.say("{} credits have been added to {}"
                                        "".format(credits.sum, user.name))
-                elif credits.operation == "withdraw":
-                    self.bank.withdraw_credits(user, credits.sum)
-                    logger.info("{}({}) removed {} credits to {} ({})".format(
+            elif credits.operation == "withdraw":
+                self.bank.withdraw_credits(user, credits.sum)
+                logger.info("{}({}) removed {} credits to {} ({})".format(
                         author.name, author.id, credits.sum, user.name, user.id))
-                    await self.bot.say("{} credits have been withdrawn from {}"
+                await self.bot.say("{} credits have been withdrawn from {}"
                                        "".format(credits.sum, user.name))
-                elif credits.operation == "set":
-                    self.bank.set_credits(user, credits.sum)
-                    logger.info("{}({}) set {} credits to {} ({})"
+            elif credits.operation == "set":
+                self.bank.set_credits(user, credits.sum)
+                logger.info("{}({}) set {} credits to {} ({})"
                                 "".format(author.name, author.id, credits.sum,
                                           user.name, user.id))
-                    await self.bot.say("{}'s credits have been set to {}".format(
+                await self.bot.say("{}'s credits have been set to {}".format(
                         user.name, credits.sum))
-            except InsufficientBalance:
-                await self.bot.say("User doesn't have enough credits.")
-            except NoAccount:
-                await self.bot.say("User has no bank account.")
-
-        else:
-            await self.bot.say("Sorry, only my master is allowed to do that!")
+        except InsufficientBalance:
+            await self.bot.say("User doesn't have enough credits.")
+        except NoAccount:
+            await self.bot.say("User has no bank account.")
 
     @_bank.command(pass_context=True, no_pm=True)
+    @commands.check(check_if_it_is_me)
     #@checks.serverowner_or_permissions(administrator=True)
     async def reset(self, ctx, confirmation: bool=False):
         """Deletes all server's bank accounts"""
-
-        if ctx.message.author.name == "anto":
             
-            if confirmation is False:
-                await self.bot.say("This will delete all bank accounts on "
+        if confirmation is False:
+            await self.bot.say("This will delete all bank accounts on "
                                    "this server.\nIf you're sure, type "
                                    "{}bank reset yes".format(ctx.prefix))
-            else:
-                self.bank.wipe_bank(ctx.message.server)
-                await self.bot.say("All bank accounts of this server have been "
-                                   "deleted.")
         else:
-            await self.bot.say("Sorry, only my master is allowed to do that!")
+            self.bank.wipe_bank(ctx.message.server)
+            await self.bot.say("All bank accounts of this server have been "
+                                   "deleted.")
 
     @commands.command(pass_context=True, no_pm=True)
     async def payday(self, ctx):  # TODO
@@ -655,6 +650,7 @@ class Economy:
         dataIO.save_json(self.file_path, self.settings)
 
     @economyset.command(pass_context=True)
+    @commands.check(check_if_it_is_me)
     async def paydaytime(self, ctx, seconds: int):
         """Seconds between each payday"""
         server = ctx.message.server
@@ -664,6 +660,7 @@ class Economy:
         dataIO.save_json(self.file_path, self.settings)
 
     @economyset.command(pass_context=True)
+    @commands.check(check_if_it_is_me)
     async def paydaycredits(self, ctx, credits: int):
         """Credits earned each payday"""
         server = ctx.message.server
@@ -673,6 +670,7 @@ class Economy:
         dataIO.save_json(self.file_path, self.settings)
 
     @economyset.command(pass_context=True)
+    @commands.check(check_if_it_is_me)
     async def registercredits(self, ctx, credits: int):
         """Credits given on registering an account"""
         server = ctx.message.server

@@ -2,13 +2,9 @@ import discord
 import asyncio
 from discord.ext import commands
 import logging
-import random
-from lxml import html
 
 import random
 from random import randint,choice
-
-import aiohttp
 
 # Logging config
 logger = logging.getLogger('discord')
@@ -26,53 +22,6 @@ async def on_ready():
     print(Nestor.user.name)
     print(Nestor.user.id)
     await Nestor.change_presence(game = discord.Game(name=".help for commands"))
-
-@Nestor.event
-async def on_member_join(member):
-    server = member.server
-    fmt = 'Welcome {0.mention} to {1.name}!'
-    await Nestor.send_message(server, fmt.format(member, server))
-
-@Nestor.command(pass_context=True, hidden = True)
-async def tg(ctx, name = "Johnnyeco", count = 1):
-    channel = ctx.message.channel
-    if ctx.message.author.name == "anto":
-        counter = 0
-        async for message in Nestor.logs_from(channel, limit=100):
-            if message.author.name == name:
-                counter+=1
-                if counter <= count:
-                    await Nestor.delete_message(message)
-        
-        await Nestor.send_message(channel,'Be a nice doggo !')
-
-    else:
-        await Nestor.send_message(channel, "Sorry, I don't take orders from you ...")
-
-async def fml_background_task():
-    await Nestor.wait_until_ready()
-    channels = Nestor.get_all_channels()
-    channels_ids = [channel.id for channel in channels if channel.name == "general" and channel.type is discord.ChannelType.text]
-
-    count = 0
-    while not Nestor.is_closed:
-        if count % 2 == 0:
-            url = 'https://www.fmylife.com/random'
-        else:
-            url = "http://www.viedemerde.fr/aleatoire"
-
-        async with aiohttp.request('GET',url) as fml_website:
-            data  = await fml_website.text()
-            tree = html.fromstring(data)
-            fml_text= tree.xpath('//p[@class="block hidden-xs"]/a/text()')
-            fml = choice(fml_text)
-
-        for id in channels_ids[:2]:
-            channel = Nestor.get_channel(id)
-            await Nestor.send_message(channel, fml)
-        await asyncio.sleep(7200) # task runs every 2 hours
-
-        count+=1
 
 """
 @Nestor.event
@@ -94,7 +43,6 @@ async def on_message(message):
         
 """
 
-
 if __name__=="__main__":
 
     # Bot token
@@ -112,9 +60,6 @@ if __name__=="__main__":
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
-
-    # Set up background tasks
-    #Nestor.loop.create_task(fml_background_task())
 
     # Run the bot
     Nestor.run(TOKEN)

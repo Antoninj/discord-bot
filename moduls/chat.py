@@ -2,7 +2,6 @@ import discord
 import asyncio
 from discord.ext import commands
 import aiohttp
-
 from chatterbot import ChatBot
 
 class Chat:
@@ -30,8 +29,6 @@ class Chat:
                 #'chatterbot.preprocessors.clean_whitespace'
                 #'chatterbot.preprocessors.convert_to_ascii']
                  )
-
-
         self.chatbot.train('chatterbot.corpus.english')
 
     @commands.command(pass_context=True)
@@ -40,11 +37,8 @@ class Chat:
         Nestor will have a conversation with you.
         eg. *hello Nestor"""
         await self.bot.say("Hi, how are you?")
-
         while True:
-
             answer = await self.bot.wait_for_message(author=ctx.message.author, timeout = 10.0)
-
             if answer is None:
                 fmt = 'Sorry, you took too long to answer, good bye.'
                 await self.bot.say(fmt)
@@ -54,7 +48,6 @@ class Chat:
             else:
                 response = self.chatbot.get_response(answer.content)
                 await self.bot.say(response)
-
 
 def setup(bot):
     bot.add_cog(Chat(bot))

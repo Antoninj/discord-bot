@@ -1,13 +1,10 @@
 import discord
 from discord.ext import commands
 import asyncio
-
 import aiohttp
 from lxml import html
-
 import random
 from random import randint
-
 
 class Game:
     """Game related commands
@@ -20,9 +17,7 @@ class Game:
         """Curve fever rank information
         Nestor will tell you your curve fever ffa and team ranks.
         eg. *rank antonin"""
-
         url = 'http://forum.curvefever.com/users/{}'.format("-".join(name))
-
         async with aiohttp.request('GET',url) as cf_website:
             data  = await cf_website.text()
             tree = html.fromstring(data)
@@ -43,17 +38,14 @@ class Game:
         """Guess a number game
         Nestor will play the guessing game.
         eg. *guess"""
-
         def guess_check(m):
                 return m.content.isdigit()
 
         await self.bot.say('Lets play a game! You have to guess a number '
                                 'between 1 and 10.')
         guess = await self.bot.wait_for_message(author=ctx.message.author, check = guess_check, timeout = 5.0)
-
         answer = random.randint(1, 10)
         counter = 0
-
         if guess is None:
             fmt = 'Sorry, you took too long. It was {}.'
             await self.bot.say(fmt.format(answer))
@@ -94,7 +86,6 @@ class Game:
         """Rock, Paper, Scissors game 
         Nestor will play Rock, Paper, Scissors.
         eg. *rps"""
-
         while True:
             await self.bot.say('Lets play **Rock, Paper, Scissors**. '
             'Pick your weapon (rock, paper or scissors) :')

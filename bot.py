@@ -4,6 +4,7 @@ from discord.ext import commands
 import logging
 import random
 from random import randint,choice
+import json
 
 # Logging config
 logger = logging.getLogger('discord')
@@ -12,15 +13,17 @@ handler = logging.FileHandler(filename='log/discord.log', encoding='utf-8', mode
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-Nestor = commands.Bot(command_prefix=commands.when_mentioned_or('.'), description="Nestor, at your service.")
 
+# load configuration file for the bot
+with open("config/config.json") as cfg:
+    #config_json =
+    config = json.load(cfg)
 
-@Nestor.event
-async def on_ready():
-    print('Logged in as :')
-    print(Nestor.user.name)
-    print(Nestor.user.id)
-    await Nestor.change_presence(game = discord.Game(name=".help for commands"))
+# Bot token
+TOKEN = config['bot_token']
+
+# This specifies what extensions to load when the Nestor starts up
+startup_extensions = config['startup_extensions']
 
 """
 @Nestor.event
@@ -41,29 +44,33 @@ async def on_message(message):
         await Nestor.process_commands(message)
         
 """
-def startup(startup_extensions):
+def startup(startup_extensions, bot):
     # Load startup extensions
     for extension in startup_extensions:
         try:
-            extension = "moduls."+ extension
-            Nestor.load_extension(extension)
+            bot.load_extension(extension)
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
-if __name__=="__main__":
+def main():
+    # Create an instance of the bot
+    Nestor = commands.Bot(command_prefix=commands.when_mentioned_or('.'), description="Nestor, at your service.")
 
-    # Bot token
-    with open("bot_token.txt","r") as file:
-        TOKEN = file.read()
-
-    # This specifies what extensions to load when the bot starts up
-    startup_extensions = ["other", "game", "fun", "image", "music", "trivia", "economy"]
+    @Nestor.event
+    async def on_ready():
+        print('Logged in as :')
+        print(Nestor.user.name)
+        print(Nestor.user.id)
+        await Nestor.change_presence(game = discord.Game(name=".help for commands"))
 
     # Load startup extensions
-    startup(startup_extensions)
+    startup(startup_extensions, Nestor)
 
     # Run the bot
     Nestor.run(TOKEN)
+
+if __name__=="__main__":
+    main()
 
 

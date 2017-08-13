@@ -2,7 +2,6 @@ import discord
 import asyncio
 from discord.ext import commands
 import logging
-
 import random
 from random import randint,choice
 
@@ -42,6 +41,15 @@ async def on_message(message):
         await Nestor.process_commands(message)
         
 """
+def startup(startup_extensions):
+    # Load startup extensions
+    for extension in startup_extensions:
+        try:
+            extension = "moduls."+ extension
+            Nestor.load_extension(extension)
+        except Exception as e:
+            exc = '{}: {}'.format(type(e).__name__, e)
+            print('Failed to load extension {}\n{}'.format(extension, exc))
 
 if __name__=="__main__":
 
@@ -53,13 +61,7 @@ if __name__=="__main__":
     startup_extensions = ["other", "game", "fun", "image", "music", "trivia", "economy"]
 
     # Load startup extensions
-    for extension in startup_extensions:
-        try:
-            extension = "moduls."+ extension
-            Nestor.load_extension(extension)
-        except Exception as e:
-            exc = '{}: {}'.format(type(e).__name__, e)
-            print('Failed to load extension {}\n{}'.format(extension, exc))
+    startup(startup_extensions)
 
     # Run the bot
     Nestor.run(TOKEN)

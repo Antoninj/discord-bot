@@ -1,11 +1,9 @@
 import discord
 import asyncio
 from discord.ext import commands
-
 from PIL import Image
 from io import BytesIO
 from lxml import html
-
 import random
 from random import randint,choice
 import aiohttp
@@ -22,10 +20,8 @@ class Fun:
     async def horoscope(self, sign : str):
         """Horoscope
         Nestor will tell you your daily horoscope based on your astrological sign.
-        eg. *horoscope leo"""
-
+        eg. .horoscope leo"""
         url = 'http://horoscope-api.herokuapp.com/horoscope/today/{}'.format(sign)
-
         async with aiohttp.request('GET',url) as horoscope_api:
             data  = await horoscope_api.json()
             horoscope  = data["horoscope"].replace("\\r\\n ","").replace("[","").replace("]","").replace("'","").strip()
@@ -36,21 +32,18 @@ class Fun:
     async def speak(self,*text : str):
         """Text to speech 
         Nestor will speak out loud what you wrote.
-        eg. *speak hello"""
+        eg. .speak hello"""
         await self.bot.say(" ".join(text), tts=True)
 
     @commands.command(pass_context=True)
     async def love(self, ctx , name1: str, name2 : str):
         """Show % of affinity between 2 persons
         Nestor will tell you if you are compatible with someone else.
-        eg. *love john lise"""
-
+        eg. .love john lise"""
         api_key = "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot"
         payload = {"fname": name1, "sname" : name2}
         headers={ "X-Mashape-Key": "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot", "Accept": "text/plain"}
-
         url = 'https://love-calculator.p.mashape.com/getPercentage'
-
         async with aiohttp.request('GET',url, params = payload , headers = headers) as resp:
             data  = await resp.json()
             response  = "Affinity percentage: {}%. {}".format(data['percentage'],data['result'])
@@ -60,29 +53,22 @@ class Fun:
     async def robot(self, ctx , text: str):
         """ Get a robot image from text
         Nestor will generate a robot image base on the text input.
-        eg. *robot antonin"""
-
+        eg. .robot antonin"""
         url = 'https://robohash.org/{}'.format(text)
-
         async with aiohttp.request('GET',url) as resp:
-            data  = await resp.read()
-            
+            data  = await resp.read() 
             img = Image.open(BytesIO(data))
             img.save("data/images/img.png")
-
             await self.bot.upload('data/images/img.png')
-
 
     @commands.command()
     async def yoda(self, *sentence : str):
         """Speak like yoda
         Nestor will change your sentence to a yoda fashion.
-        eg. *yoda You are young and dumb."""
-
+        eg. .yoda You are young and dumb."""
         api_key = "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot"
         payload = {"sentence":' '.join(sentence)}
         headers={ "X-Mashape-Key": "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot", "Accept": "text/plain"}
-
         url = 'https://yoda.p.mashape.com/yoda'
         async with aiohttp.request('GET',url, params = payload , headers = headers) as resp:
             await self.bot.say(await resp.text())
@@ -90,27 +76,24 @@ class Fun:
     @commands.command()
     async def penis(self, *, user : discord.Member):
         """Detects user's penis length
-        This is 100% accurate."""
+        This is 100% accurate.
+        eg .penis @user"""
         state = random.getstate()
         random.seed(user.id)
         dong = "8{}D".format("=" * random.randint(5, 30))
         random.setstate(state)
         await self.bot.say("Size: " + dong )
 
-
     @commands.command()
     async def quotes(self, count : int = 1):
         """Random quotes
         Nestor will provide you with a random quotation.
-        eg. *quotes"""
-
+        eg. .quotes"""
         api_key = "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot"
         categories = ["movies","famous"]
-
         payload = {"cat":random.choice(categories),'count' : count}
         headers={ "X-Mashape-Key": "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot", 
         "Accept": "text/plain"}
-
         url = 'https://andruxnet-random-famous-quotes.p.mashape.com/'
         async with aiohttp.request('GET',url, params = payload , headers = headers) as resp:
 
@@ -129,25 +112,20 @@ class Fun:
 
         await self.bot.say(sentence)
 
-
     @commands.command()
     async def coinflip(self, *coinflip : str):
         """Flip a coin
         Nestor will randomly choose between 'heads' or 'tails'.
-        eg. *coinflip"""
-
+        eg. .coinflip"""
         coinflip = ['Heads!', 'Tails!']
         await self.bot.say(random.choice(coinflip))
-
 
     @commands.command()
     async def fml(self):
         """ Fuck my life
         Nestor will tell you a random fuck my life sentence.
-        eg. *fml"""
-
+        eg. .fml"""
         url = 'https://www.fmylife.com/random'
-
         async with aiohttp.request('GET',url) as fml_website:
             data  = await fml_website.text()
             tree = html.fromstring(data)
@@ -181,10 +159,6 @@ class Fun:
             count+=1
 
     async def quotes_background_task(self, time : int, count : int = 1):
-        """Random quotes
-        Nestor will provide you with a random quotation.
-        eg. *quotes"""
-
         api_key = "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot"
         categories = ["movies","famous"]
 
@@ -193,7 +167,6 @@ class Fun:
         "Accept": "text/plain"}
 
         url = 'https://andruxnet-random-famous-quotes.p.mashape.com/'
-
         await self.bot.wait_until_ready()
         channels = self.bot.get_all_channels()
         channels_ids = [channel.id for channel in channels if channel.name == "bot-spam" and channel.type is discord.ChannelType.text]
@@ -215,7 +188,6 @@ class Fun:
                 zipped = list(zip(quotes,authors))
                 curated  = [" ".join(item) for item in zipped]
                 sentence = '\n'.join(curated)
-
             for id in channels_ids[:2]:
                 channel = self.bot.get_channel(id)
                 await self.bot.send_message(channel, sentence)

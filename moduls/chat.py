@@ -35,7 +35,7 @@ class Chat:
     async def chat(self, ctx):
         """Chat with nestor
         Nestor will have a conversation with you.
-        eg. *hello Nestor"""
+        eg. .chat Nestor"""
         await self.bot.say("Hi, how are you?")
         while True:
             answer = await self.bot.wait_for_message(author=ctx.message.author, timeout = 10.0)

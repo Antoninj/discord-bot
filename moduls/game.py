@@ -16,17 +16,15 @@ class Game:
     async def curve(self, *name : str):
         """Curve fever rank information
         Nestor will tell you your curve fever ffa and team ranks.
-        eg. *rank antonin"""
+        eg. .rank antonin"""
         url = 'http://forum.curvefever.com/users/{}'.format("-".join(name))
         async with aiohttp.request('GET',url) as cf_website:
             data  = await cf_website.text()
             tree = html.fromstring(data)
             player_ranks= tree.xpath('//div[@class="profile"][1]/dl/dd/text()')
             player_ranks_info= tree.xpath('//div[@class="profile"][1]/dl/dt/text()')
-
             player_ranks_info = [str(item) +":" for item in player_ranks_info]
             player_info = list(zip(player_ranks_info,player_ranks))
-
             player_info  = [" ".join(item) for item in player_info]
             player_info = '\n'.join(player_info[:len(player_info)-1])
 
@@ -37,7 +35,7 @@ class Game:
     async def guess(self, ctx):
         """Guess a number game
         Nestor will play the guessing game.
-        eg. *guess"""
+        eg. .guess"""
         def guess_check(m):
                 return m.content.isdigit()
 
@@ -50,7 +48,6 @@ class Game:
             fmt = 'Sorry, you took too long. It was {}.'
             await self.bot.say(fmt.format(answer))
             return
-
         while counter<=3:
             counter += 1
             if counter<3:
@@ -75,7 +72,6 @@ class Game:
                 await self.bot.say('Congratulations! It took you '
                     '**%d** tries to guess the correct answer.' % counter)
                 break
-
             else:
                 await self.bot.say('Sorry, It was {}.'.format(answer))
                 break
@@ -85,7 +81,7 @@ class Game:
     async def rps(self, ctx):
         """Rock, Paper, Scissors game 
         Nestor will play Rock, Paper, Scissors.
-        eg. *rps"""
+        eg. .rps"""
         while True:
             await self.bot.say('Lets play **Rock, Paper, Scissors**. '
             'Pick your weapon (rock, paper or scissors) :')

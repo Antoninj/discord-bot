@@ -115,7 +115,8 @@ class Image:
 
     @commands.command(pass_context=True, no_pm=True)
     async def gif(self, ctx, *keywords):
-        """Retrieves first search result from giphy"""
+        """Retrieves first search result from giphy
+        """
         if keywords:
             keywords = "+".join(keywords)
         else:

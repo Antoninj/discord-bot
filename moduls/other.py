@@ -1,7 +1,6 @@
 import discord
 import asyncio
 from discord.ext import commands
-
 import random
 from random import randint
 
@@ -33,7 +32,7 @@ class Other:
     async def status(self, *args):
         """Change Nestor status
         Nestor will change its status in Discord.      
-        eg. *status Discord"""
+        eg. .status Discord"""
 
         args = ' '.join(args)
         await self.bot.change_presence(game = discord.Game(name='%s' % args))

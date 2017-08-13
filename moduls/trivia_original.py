@@ -9,7 +9,9 @@ import discord
 import time
 import os
 import asyncio
-import chardet
+from aiohttp import ClientSession
+import pytrivia
+from pytrivia import Category, Diffculty, Type, Trivia
 
 DEFAULTS = {"MAX_SCORE"    : 10,
             "TIMEOUT"      : 120,
@@ -17,12 +19,14 @@ DEFAULTS = {"MAX_SCORE"    : 10,
             "BOT_PLAYS"    : False,
             "REVEAL_ANSWER": True}
 
-TriviaLine = namedtuple("TriviaLine", "question answers")
+TriviaLine = namedtuple("TriviaLine", "question answers correct_answer")
 
 class Trivia:
     """General commands."""
-    def __init__(self, bot):
+    def __init__(self, bot, session, trivia_api):
         self.bot = bot
+        self.trivia_api = trivia_api 
+        self.session = session
         self.trivia_sessions = []
         self.file_path = "data/trivia/settings.json"
         settings = dataIO.load_json(self.file_path)
@@ -90,14 +94,21 @@ class Trivia:
         self.save_settings()
 
     @commands.group(pass_context=True, invoke_without_command=True, no_pm=True)
-    async def trivia(self, ctx, list_name: str):
-        """Start a trivia session with the specified list"""
+    async def trivia(self, ctx):
+        """Start a trivia session"""
         message = ctx.message
         server = message.server
         session = self.get_trivia_by_channel(message.channel)
         if not session:
             try:
-                trivia_list = self.parse_trivia_list(list_name)
+                category = await self.select_category(ctx)
+                if category:
+                    category = category.title()
+                    difficulty = await self.select_difficulty(ctx)
+                    if difficulty:
+                        difficulty = difficulty.title()
+                        trivia_list = await self.parse_trivia_list(category,difficulty)
+
             except FileNotFoundError:
                 await self.bot.say("That trivia list doesn't exist.")
             except Exception as e:
@@ -127,48 +138,70 @@ class Trivia:
         else:
             await self.bot.say("There's no trivia session ongoing in this channel.")
 
-    @trivia.group(name="list")
-    async def trivia_list(self):
-        """Shows available trivia lists"""
-        lists = os.listdir("data/trivia/")
-        lists = [l for l in lists if l.endswith(".txt") and " " not in l]
-        lists = [l.replace(".txt", "") for l in lists]
+    async def select_category(self, ctx):
+        """Shows available trivia game categories"""
+        categories = [cat.name for cat in Category]
 
-        if lists:
-            msg = "+ Available trivia lists\n\n" + ", ".join(sorted(lists))
-            msg = box(msg, lang="diff")
-            if len(lists) < 100:
-                await self.bot.say(msg)
-            else:
-                await self.bot.whisper(msg)
+        def category_check(m):
+                return m.content in categories or m.content.title() in categories
+
+        if categories:
+            msg1 = "Select a category please: \n\n"
+            await self.bot.say(msg1)
+            msg2 = "+ Available trivia categories\n\n" + ", ".join(sorted(categories))
+            msg2 = box(msg2, lang="diff")
+            await self.bot.say(msg2)
+
+        answer = await self.bot.wait_for_message(author=ctx.message.author, check=category_check, timeout=10.0)
+
+        if answer is None:
+            fmt = 'Sorry, you took too long... Good bye! '
+            await self.bot.say(fmt)
+            return None
         else:
-            await self.bot.say("There are no trivia lists available.")
+            return answer.content
 
-    def parse_trivia_list(self, filename):
-        path = "data/trivia/{}.txt".format(filename)
+
+    async def select_difficulty(self,ctx):
+        """Shows available trivia game difficulties"""
+        difficulties = [diff.name for diff in Diffculty]
+
+        def difficulty_check(m):
+                return m.content in difficulties or m.content.title() in difficulties
+
+        if difficulties:
+            msg1 = "Select a difficulty please: \n\n"
+            await self.bot.say(msg1)
+            msg2 = "+ Available trivia difficulties\n\n" + ", ".join(sorted(difficulties))
+            msg2 = box(msg2, lang="diff")
+            await self.bot.say(msg2)
+
+        answer = await self.bot.wait_for_message(author=ctx.message.author, check=difficulty_check, timeout=10.0)
+
+        if answer is None:
+            fmt = 'Sorry, you took too long... Good bye! '
+            await self.bot.say(fmt)
+            return None
+
+        else:
+            return answer.content
+
+    async def parse_trivia_list(self, category, difficulty):
+
+        response = await self.trivia_api.request_async(self.session, True, 50, Category[category], Diffculty[difficulty], Type.Multiple_Choice)
+        #response = self.trivia_api.request(50, Category[category], Diffculty[difficulty], Type.Multiple_Choice)
+        questions = [result['question'] for result in response['results']]
+        correct_answers = [result['correct_answer'] for result in response['results']]
+        incorrect_answers = [result['incorrect_answers'] for result in response['results']]
+        answers = [incorrect_answers[i]+[correct_answers[i]] for i in range(len(incorrect_answers))]
+
         parsed_list = []
-
-        with open(path, "rb") as f:
-            try:
-                encoding = chardet.detect(f.read())["encoding"]
-            except:
-                encoding = "ISO-8859-1"
-
-        with open(path, "r", encoding=encoding) as f:
-            trivia_list = f.readlines()
-
-        for line in trivia_list:
-            if "`" not in line:
-                continue
-            line = line.replace("\n", "")
-            line = line.split("`")
-            question = line[0]
-            answers = []
-            for l in line[1:]:
-                answers.append(l.strip())
-            if len(line) >= 2 and question and answers:
-                line = TriviaLine(question=question, answers=answers)
-                parsed_list.append(line)
+        for qa in zip(questions,answers,correct_answers):
+            line_question = qa[0]
+            line_answers = qa[1]
+            line_correct_answer = qa[2]
+            line = TriviaLine(question=line_question, answers=line_answers, correct_answer=line_correct_answer)
+            parsed_list.append(line)
 
         if not parsed_list:
             raise ValueError("Empty trivia list")
@@ -257,7 +290,7 @@ class TriviaSession():
             return True
         else:
             if self.settings["REVEAL_ANSWER"]:
-                msg = choice(self.reveal_messages).format(self.current_line.answers[0])
+                msg = choice(self.reveal_messages).format(self.current_line.correct_answer)
             else:
                 msg = choice(self.fail_messages)
             if self.settings["BOT_PLAYS"]:
@@ -285,7 +318,7 @@ class TriviaSession():
         self.timeout = time.perf_counter()
         has_guessed = False
 
-        for answer in self.current_line.answers:
+        for answer in self.current_line.correct_answer:
             answer = answer.lower()
             guess = message.content.lower()
             if " " not in answer:  # Exact matching, issue #331
@@ -322,4 +355,8 @@ def check_files():
 def setup(bot):
     check_folders()
     check_files()
-    bot.add_cog(Trivia(bot))
+    session = ClientSession()
+    trivia_api = pytrivia.Trivia(True)
+    bot.add_cog(Trivia(bot,session,trivia_api))
+
+    

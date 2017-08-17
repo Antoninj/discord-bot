@@ -24,8 +24,7 @@ class Fun:
         url = 'http://horoscope-api.herokuapp.com/horoscope/today/{}'.format(sign)
         async with aiohttp.request('GET',url) as horoscope_api:
             data  = await horoscope_api.json()
-            horoscope  = data["horoscope"].replace("\\r\\n ","").replace("[","").replace("]","").replace("'","").strip()
-
+            horoscope  = data["horoscope"].replace("\\r\\n","").replace("[","").replace("\\n","").replace("]","").replace("'","").strip()
             await self.bot.say(horoscope)
 
     @commands.command()

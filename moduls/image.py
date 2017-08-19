@@ -3,15 +3,20 @@ from random import choice, shuffle
 import aiohttp
 import functools
 import asyncio
+import json
 
 try:
     from imgurpython import ImgurClient
 except:
     ImgurClient = False
 
-CLIENT_ID = "1fd3ef04daf8cab"
-CLIENT_SECRET = "f963e574e8e3c17993c933af4f0522e1dc01e230"
-GIPHY_API_KEY = "dc6zaTOxFJmzC"
+# Load configuration file for the bot
+with open("config/config.json") as cfg:
+    config = json.load(cfg)
+
+CLIENT_ID = config["imgurclient_id"]
+CLIENT_SECRET = config["imgurclient_secret"]
+GIPHY_API_KEY = config["giphy_api_key"]
 
 
 class Image:

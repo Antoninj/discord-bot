@@ -37,8 +37,6 @@ class Other:
         args = ' '.join(args)
         await self.bot.change_presence(game = discord.Game(name='%s' % args))
 
-    
-    #@self.bot.event
     async def on_member_join(self, member):
         server = member.server
         fmt = 'Welcome {0.mention} to {1.name}!'
@@ -60,6 +58,7 @@ class Other:
             
         await self.bot.send_message(channel,'Be a nice doggo!')
 
-
 def setup(bot):
+    b = Other(bot)
+    bot.add_listener(b.on_member_join,"on_member_join")
     bot.add_cog(Other(bot))

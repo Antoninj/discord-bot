@@ -5,7 +5,8 @@ import aiohttp
 from chatterbot import ChatBot
 
 class Chat:
-    """Chat related commands
+    """Chat related commands to have a discussion with Nestor. 
+    Be warned, Nestor's IQ is estimated to be around 10
     """
     def __init__(self, bot):
         self.bot = bot

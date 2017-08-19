@@ -7,7 +7,7 @@ import random
 from random import randint
 
 class Game:
-    """Game related commands
+    """Game related commands : play a bunch of stupid games and/or get gaming stats
     """
     def __init__(self, bot):
         self.bot = bot

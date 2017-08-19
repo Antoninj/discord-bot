@@ -13,37 +13,15 @@ handler = logging.FileHandler(filename='log/discord.log', encoding='utf-8', mode
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-
-# load configuration file for the bot
+# Load configuration file for the bot
 with open("config/config.json") as cfg:
-    #config_json =
     config = json.load(cfg)
-
 # Bot token
 TOKEN = config['bot_token']
 
 # This specifies what extensions to load when the Nestor starts up
 startup_extensions = config['startup_extensions']
 
-"""
-@Nestor.event
-async def on_message(message):
-
-    insults = ["Cool story, bro","I'd love to stop and chat to you but I'd rather have type 2 diabetes.",
-    "Fascinating story, in what chapter do you shut the fuck up?","I give zero fucks.",
-    "Looking for a fuck to give.","I don't give a flying fuck.","You Fucktard!",
-    "Fuck you very much.","Please go fuck yourself","Maybe. Maybe not. Maybe fuck yourself.",
-    "Please choke on a bucket of cocks.","Eat a bag of fucking dicks."]
-
-    if message.author == Nestor.user:
-        return
-    elif message.author.name == "notdiddin":
-        await Nestor.send_message(message.channel, random.choice(insults))
-        return
-    else:
-        await Nestor.process_commands(message)
-        
-"""
 def startup(startup_extensions, bot):
     # Load startup extensions
     for extension in startup_extensions:

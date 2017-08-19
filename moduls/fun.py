@@ -7,9 +7,16 @@ from lxml import html
 import random
 from random import randint,choice
 import aiohttp
+import json
+
+# Load configuration file for the bot
+with open("config/config.json") as cfg:
+    config = json.load(cfg)
+
+API_KEY = config["mashape_api_key"]
 
 class Fun:
-    """Fun commands
+    """A bunch of (hopefully) fun commands to keep you entertained
     """
     def __init__(self, bot):
         self.bot = bot
@@ -39,9 +46,8 @@ class Fun:
         """Show % of affinity between 2 persons
         Nestor will tell you if you are compatible with someone else.
         eg. .love john lise"""
-        api_key = "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot"
         payload = {"fname": name1, "sname" : name2}
-        headers={ "X-Mashape-Key": "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot", "Accept": "text/plain"}
+        headers={ "X-Mashape-Key": API_KEY, "Accept": "text/plain"}
         url = 'https://love-calculator.p.mashape.com/getPercentage'
         async with aiohttp.request('GET',url, params = payload , headers = headers) as resp:
             data  = await resp.json()
@@ -65,9 +71,8 @@ class Fun:
         """Speak like yoda
         Nestor will change your sentence to a yoda fashion.
         eg. .yoda You are young and dumb."""
-        api_key = "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot"
         payload = {"sentence":' '.join(sentence)}
-        headers={ "X-Mashape-Key": "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot", "Accept": "text/plain"}
+        headers={ "X-Mashape-Key": API_KEY, "Accept": "text/plain"}
         url = 'https://yoda.p.mashape.com/yoda'
         async with aiohttp.request('GET',url, params = payload , headers = headers) as resp:
             await self.bot.say(await resp.text())
@@ -88,11 +93,9 @@ class Fun:
         """Random quotes
         Nestor will provide you with a random quotation.
         eg. .quotes"""
-        api_key = "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot"
         categories = ["movies","famous"]
         payload = {"cat":random.choice(categories),'count' : count}
-        headers={ "X-Mashape-Key": "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot", 
-        "Accept": "text/plain"}
+        headers={ "X-Mashape-Key": API_KEY, "Accept": "text/plain"}
         url = 'https://andruxnet-random-famous-quotes.p.mashape.com/'
         async with aiohttp.request('GET',url, params = payload , headers = headers) as resp:
 
@@ -136,7 +139,6 @@ class Fun:
         await self.bot.wait_until_ready()
         channels = self.bot.get_all_channels()
         channels_ids = [channel.id for channel in channels if channel.name == "bot-spam" and channel.type is discord.ChannelType.text]
-
         count = 0
         while not self.bot.is_closed:
             if count % 2 == 0:
@@ -158,12 +160,9 @@ class Fun:
             count+=1
 
     async def quotes_background_task(self, time : int, count : int = 1):
-        api_key = "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot"
         categories = ["movies","famous"]
-
         payload = {"cat":random.choice(categories),'count' : count}
-        headers={ "X-Mashape-Key": "icgNGtioNNmshqOQuh3nPYSOcmo3p1eV3pHjsnTtNXTLiC0pot", 
-        "Accept": "text/plain"}
+        headers={ "X-Mashape-Key": API_KEY, "Accept": "text/plain"}
 
         url = 'https://andruxnet-random-famous-quotes.p.mashape.com/'
         await self.bot.wait_until_ready()

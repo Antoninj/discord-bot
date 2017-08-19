@@ -13,9 +13,9 @@ import time
 import logging
 import random
 
-default_settings = {"PAYDAY_TIME": 300, "PAYDAY_CREDITS": 120,
-                    "SLOT_MIN": 5, "SLOT_MAX": 100, "SLOT_TIME": 0,
-                    "REGISTER_CREDITS": 0}
+default_settings = {"PAYDAY_TIME": 3600, "PAYDAY_CREDITS": 500,
+                    "SLOT_MIN": 1, "SLOT_MAX": 10000, "SLOT_TIME": 0,
+                    "REGISTER_CREDITS": 1000}
 
 def check_if_it_is_me(ctx):
     return ctx.message.author.name == "anto"

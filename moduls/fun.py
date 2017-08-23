@@ -20,8 +20,8 @@ class Fun:
     """
     def __init__(self, bot):
         self.bot = bot
-        self.bot.loop.create_task(self.fml_background_task(7200)) # task runs every 2 hours
-        self.bot.loop.create_task(self.quotes_background_task(3600)) # task runs every hour
+        self.bot.loop.create_task(self.fml_background_task(7200)) # task runs every even hour
+        self.bot.loop.create_task(self.quotes_background_task(3600)) # task runs every odd hour
 
     @commands.command()
     async def horoscope(self, sign : str):
@@ -31,6 +31,7 @@ class Fun:
         url = 'http://horoscope-api.herokuapp.com/horoscope/today/{}'.format(sign)
         async with aiohttp.request('GET',url) as horoscope_api:
             data  = await horoscope_api.json()
+            #print(data["horoscope"])
             horoscope  = data["horoscope"].replace("\\r\\n","").replace("[","").replace("\\n","").replace("]","").replace("'","").strip()
             await self.bot.say(horoscope)
 

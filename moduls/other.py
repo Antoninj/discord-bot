@@ -41,6 +41,11 @@ class Other:
         server = member.server
         fmt = 'Welcome {0.mention} to {1.name}!'
         await self.bot.send_message(server, fmt.format(member, server))
+
+    async def on_member_leave(self, member):
+        server = member.server
+        fmt = 'Farewell, {0.mention} !'
+        await self.bot.send_message(server, fmt.format(member))
     
     def check_if_it_is_me(ctx):
         return ctx.message.author.name == "anto"
@@ -61,4 +66,5 @@ class Other:
 def setup(bot):
     b = Other(bot)
     bot.add_listener(b.on_member_join,"on_member_join")
+    bot.add_listener(b.on_member_leave,"on_member_leave")
     bot.add_cog(Other(bot))

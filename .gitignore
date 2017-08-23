@@ -2,5 +2,4 @@
 *.zip
 *.pyc
 ssh.md
-bot_token.txt
 config.json

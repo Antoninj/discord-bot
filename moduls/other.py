@@ -3,7 +3,6 @@ import asyncio
 from discord.ext import commands
 import random
 from random import randint
-
 import aiohttp
 
 class Other:
@@ -57,11 +56,14 @@ class Other:
         counter = 0
         async for message in self.bot.logs_from(channel, limit=100):
             if message.author.name == name:
+                author = message.author
                 counter+=1
                 if counter <= count:
                     await self.bot.delete_message(message)
-            
-        await self.bot.send_message(channel,'Be a nice doggo!')
+        
+        if counter >1=:
+            msg = 'Be a nice doggo {}!'.format(author.mention)
+            await self.bot.send_message(channel,msg)
 
 def setup(bot):
     b = Other(bot)

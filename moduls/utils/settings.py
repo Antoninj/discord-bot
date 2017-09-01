@@ -6,7 +6,6 @@ import argparse
 # moduls
 default_path = "data/Master/settings.json"
 
-
 class Settings:
 
     def __init__(self, path=default_path, parse_args=True):

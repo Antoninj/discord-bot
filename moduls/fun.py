@@ -1,8 +1,6 @@
 import discord
 import asyncio
 from discord.ext import commands
-from PIL import Image
-from io import BytesIO
 from lxml import html
 import random
 from random import randint,choice
@@ -54,18 +52,6 @@ class Fun:
             data  = await resp.json()
             response  = "Affinity percentage: {}%. {}".format(data['percentage'],data['result'])
             await self.bot.say(response)
-
-    @commands.command(pass_context=True)
-    async def robot(self, ctx , text: str):
-        """ Get a robot image from text
-        Nestor will generate a robot image base on the text input.
-        eg. .robot antonin"""
-        url = 'https://robohash.org/{}'.format(text)
-        async with aiohttp.request('GET',url) as resp:
-            data  = await resp.read() 
-            img = Image.open(BytesIO(data))
-            img.save("data/images/img.png")
-            await self.bot.upload('data/images/img.png')
 
     @commands.command()
     async def yoda(self, *sentence : str):

@@ -2,8 +2,11 @@ from discord.ext import commands
 from random import choice, shuffle
 import aiohttp
 import functools
+import PIL
+from io import BytesIO
 import asyncio
 import json
+
 
 try:
     from imgurpython import ImgurClient
@@ -172,7 +175,20 @@ class Image:
         url = 'https://nijikokun-random-cats.p.mashape.com/random'
         async with aiohttp.request('GET',url, headers = headers) as resp:
             data  = await resp.json()
+            print(data)
             await self.bot.say(data["source"])
+
+    @commands.command(pass_context=True)
+    async def robot(self, ctx , text: str):
+        """ Get a robot image from text
+        Nestor will generate a robot image base on the text input.
+        eg. .robot antonin"""
+        url = 'https://robohash.org/{}'.format(text)
+        async with aiohttp.request('GET',url) as resp:
+            data  = await resp.read() 
+            img = PIL.Image.open(BytesIO(data))
+            img.save("data/images/img.png")
+            await self.bot.upload('data/images/img.png')
 
 
 def setup(bot):

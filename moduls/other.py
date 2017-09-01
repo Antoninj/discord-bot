@@ -61,7 +61,7 @@ class Other:
                 if counter <= count:
                     await self.bot.delete_message(message)
         
-        if counter >1=:
+        if counter >=1 :
             msg = 'Be a nice doggo {}!'.format(author.mention)
             await self.bot.send_message(channel,msg)
 

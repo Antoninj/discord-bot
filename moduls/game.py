@@ -84,16 +84,16 @@ class Game:
         eg. .rps"""
         while True:
             await self.bot.say('Lets play **Rock, Paper, Scissors**. '
-            'Pick your weapon (rock, paper or scissors) :')
-            choices = ['rock', 'paper', 'scissors']
+            'Pick your weapon')
+            choices = ['Rock', 'Paper', 'Scissors']
             computer_choice = choices[randint(0, 2)]
             player_response = await self.bot.wait_for_message(author=ctx.message.author)
             player_choice = player_response.content
-
+            player_choice = player_choice.title()
             beats = {
-                'rock': ['paper'],
-                'paper': ['scissors'],
-                'scissors': ['rock']
+                'Rock': ['Paper'],
+                'Paper': ['Scissors'],
+                'Scissors': ['Rock']
             }
 
             while computer_choice and player_choice in choices:

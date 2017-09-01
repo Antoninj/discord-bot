@@ -17,6 +17,8 @@ with open("config/config.json") as cfg:
 CLIENT_ID = config["imgurclient_id"]
 CLIENT_SECRET = config["imgurclient_secret"]
 GIPHY_API_KEY = config["giphy_api_key"]
+API_KEY = config["mashape_api_key"]
+
 
 
 class Image:
@@ -162,6 +164,15 @@ class Image:
                     await self.bot.say("No results found.")
             else:
                 await self.bot.say("Error contacting the API")
+
+    @commands.command(pass_context=True)
+    async def cat(self,ctx):
+        """Generate random cat picture"""
+        headers={ "X-Mashape-Key": API_KEY, "Accept": "application/json"}
+        url = 'https://nijikokun-random-cats.p.mashape.com/random'
+        async with aiohttp.request('GET',url, headers = headers) as resp:
+            data  = await resp.json()
+            await self.bot.say(data["source"])
 
 
 def setup(bot):

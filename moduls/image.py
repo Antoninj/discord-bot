@@ -1,5 +1,5 @@
 from discord.ext import commands
-from random import choice, shuffle
+from random import choice, shuffle,randint
 import aiohttp
 import functools
 import PIL
@@ -167,7 +167,7 @@ class Image:
                     await self.bot.say("No results found.")
             else:
                 await self.bot.say("Error contacting the API")
-
+    
     @commands.command(pass_context=True)
     async def cat(self,ctx):
         """Generate random cat picture"""
@@ -177,6 +177,18 @@ class Image:
             data  = await resp.json()
             print(data)
             await self.bot.say(data["source"])
+    
+    '''
+    @commands.command(pass_context=True)
+    async def cat(self,ctx):
+        """Generate random cat picture"""
+        nbr = randint(1, 1000)
+        url = "http://random.cat/view?i={}".format(nbr)
+        async with aiohttp.request('GET',url) as resp:
+            data  = await resp.json()
+            print(data)
+            #await self.bot.say(data["source"])
+    '''
 
     @commands.command(pass_context=True)
     async def robot(self, ctx , text: str):

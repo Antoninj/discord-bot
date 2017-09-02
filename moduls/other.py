@@ -67,6 +67,6 @@ class Other:
 
 def setup(bot):
     b = Other(bot)
-    bot.add_listener(b.on_member_join,"on_member_join")
-    bot.add_listener(b.on_member_leave,"on_member_leave")
+    #bot.add_listener(b.on_member_join,"on_member_join")
+    #bot.add_listener(b.on_member_leave,"on_member_leave")
     bot.add_cog(Other(bot))

@@ -37,9 +37,7 @@ def main():
 
     @Nestor.event
     async def on_ready():
-        print('Logged in as :')
-        print(Nestor.user.name)
-        print(Nestor.user.id)
+        print("Logged in as {}.".format(Nestor.user.name))
         await Nestor.change_presence(game = discord.Game(name=".help for commands"))
 
     # Load startup extensions

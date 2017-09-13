@@ -21,6 +21,25 @@ class Fun:
         self.bot.loop.create_task(self.fml_background_task(7200)) # task runs every even hour
         self.bot.loop.create_task(self.quotes_background_task(3600)) # task runs every odd hour
 
+    def check_if_it_is_me(ctx):
+        return ctx.message.author.name == "anto"
+
+    @commands.command(pass_context=True, hidden = True)
+    @commands.check(check_if_it_is_me)
+    async def tg(self, ctx, name = "anto", count = 1):
+        channel = ctx.message.channel
+        counter = 0
+        async for message in self.bot.logs_from(channel, limit=1000):
+            if message.author.name == name:
+                author = message.author
+                counter+=1
+                if counter <= count:
+                    await self.bot.delete_message(message)
+        
+        if counter >=1 :
+            msg = 'Be a nice doggo {}!'.format(author.mention)
+            await self.bot.send_message(channel,msg)
+            
     @commands.command()
     async def horoscope(self, sign : str):
         """Horoscope

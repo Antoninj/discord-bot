@@ -5,8 +5,8 @@ import random
 from random import randint
 import aiohttp
 
-class Other:
-    """General purpose commands
+class Extensions:
+    """Module management related commands
     """
     def __init__(self, bot):
         self.bot = bot
@@ -45,28 +45,9 @@ class Other:
         server = member.server
         fmt = 'Farewell, {0.mention} !'
         await self.bot.send_message(server, fmt.format(member))
-    
-    def check_if_it_is_me(ctx):
-        return ctx.message.author.name == "anto"
-
-    @commands.command(pass_context=True, hidden = True)
-    @commands.check(check_if_it_is_me)
-    async def tg(self, ctx, name = "Johnnyeco", count = 1):
-        channel = ctx.message.channel
-        counter = 0
-        async for message in self.bot.logs_from(channel, limit=100):
-            if message.author.name == name:
-                author = message.author
-                counter+=1
-                if counter <= count:
-                    await self.bot.delete_message(message)
-        
-        if counter >=1 :
-            msg = 'Be a nice doggo {}!'.format(author.mention)
-            await self.bot.send_message(channel,msg)
 
 def setup(bot):
-    b = Other(bot)
+    b = Extensions(bot)
     #bot.add_listener(b.on_member_join,"on_member_join")
     #bot.add_listener(b.on_member_leave,"on_member_leave")
-    bot.add_cog(Other(bot))
+    bot.add_cog(Extensions(bot))

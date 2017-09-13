@@ -3,6 +3,7 @@ from random import choice, shuffle,randint
 import aiohttp
 import functools
 import PIL
+from PIL import Image
 from io import BytesIO
 import asyncio
 import json
@@ -130,7 +131,7 @@ class Image:
         if keywords:
             keywords = "+".join(keywords)
         else:
-            await self.bot.send_cmd_help(ctx)
+            await self.bot.say("Please enter a search term")
             return
 
         url = ("http://api.giphy.com/v1/gifs/search?&api_key={}&q={}"
@@ -152,7 +153,7 @@ class Image:
         if keywords:
             keywords = "+".join(keywords)
         else:
-            await self.bot.send_cmd_help(ctx)
+            await self.bot.say("Please enter a search term")
             return
 
         url = ("http://api.giphy.com/v1/gifs/random?&api_key={}&tag={}"
@@ -168,7 +169,8 @@ class Image:
             else:
                 await self.bot.say("Error contacting the API")
     
-    @commands.command(pass_context=True)
+    # This needs to be debugged
+    @commands.command(pass_context=True, hidden = True)
     async def cat(self,ctx):
         """Generate random cat picture"""
         headers={ "X-Mashape-Key": API_KEY, "Accept": "application/json"}
@@ -191,11 +193,11 @@ class Image:
     '''
 
     @commands.command(pass_context=True)
-    async def robot(self, ctx , text: str):
+    async def robot(self, ctx , *text: str):
         """ Get a robot image from text
         Nestor will generate a robot image base on the text input.
         eg. .robot antonin"""
-        url = 'https://robohash.org/{}'.format(text)
+        url = 'https://robohash.org/{}'.format("-".join(text))
         async with aiohttp.request('GET',url) as resp:
             data  = await resp.read() 
             img = PIL.Image.open(BytesIO(data))
